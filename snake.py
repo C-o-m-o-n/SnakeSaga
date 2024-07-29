@@ -8,17 +8,31 @@ pygame.init()
 # Set up game variables and constants
 WIDTH, HEIGHT = 800, 600
 BLOCK_SIZE = 20
+# OBSTACLE_BLOCK_SIZE = random.randint(BLOCK_SIZE, BLOCK_SIZE * random.randint(2, 9))
 SPEED = 10
 
 # Set up colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+
+# Initialize score
+score = 0
+
+# Initialize obstacles
+obstacles = []
 
 # Set up display and font
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
 font = pygame.font.Font(None, 36)
+
+
+for _ in range(10):
+    x = random.randint(0, WIDTH - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
+    y = random.randint(0, HEIGHT - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
+    obstacles.append((x, y))
 
 class Snake:
     def __init__(self):
@@ -53,6 +67,7 @@ class Food:
         pygame.draw.rect(screen, RED, (self.x, self.y, BLOCK_SIZE, BLOCK_SIZE))
 
 def main():
+    global score
     clock = pygame.time.Clock()
     snake = Snake()
     food = Food()
@@ -76,15 +91,44 @@ def main():
         screen.fill(BLACK)
         snake.draw()
         food.draw()
+        
+        # Draw obstacles
+        # for obstacle in obstacles:
+        #     pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], OBSTACLE_BLOCK_SIZE, BLOCK_SIZE))
+        
+        # Check for collision with obstacles
+        # for obstacle in obstacles:
+        #     if (snake.x, snake.y) == obstacle:
+        #         print("Game Over")
+        #         print("Final Score:", score)
+        #         pygame.quit()
+        #         sys.exit()
+
+        # check for collision with self and boundaries
+        # if (snake.x < 0 or snake.x >= WIDTH or
+        #     snake.y < 0 or snake.y >= HEIGHT or
+        #     (snake.x, snake.y) in snake.body[:-1]):
+        #     print("game over")
+        #     print("final score:", score)
+        #     pygame.quit()
+        #     sys.exit()
 
         if snake.x == food.x and snake.y == food.y:
             food = Food()
             snake.body.append((snake.x, snake.y))
 
+            score += 1
+
         elif (snake.x < 0 or snake.x >= WIDTH or snake.y < 0 or snake.y >= HEIGHT or (snake.x, snake.y) in snake.body[:-1]):
             print("Game Over")
+            print("Final Score:", score)
             pygame.quit()
             sys.exit()
+
+        
+        # Display score
+        score_text = font.render("Score: " + str(score), True, WHITE)
+        screen.blit(score_text, (10, 10))
 
         pygame.display.flip()
         clock.tick(SPEED)
