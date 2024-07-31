@@ -8,7 +8,7 @@ pygame.init()
 # Set up game variables and constants
 WIDTH, HEIGHT = 800, 600
 BLOCK_SIZE = 20
-# OBSTACLE_BLOCK_SIZE = random.randint(BLOCK_SIZE, BLOCK_SIZE * random.randint(2, 9))
+OBSTACLE_BLOCK_SIZE = random.randint(BLOCK_SIZE, BLOCK_SIZE * random.randint(2, 9))
 SPEED = 10
 
 # Set up colors
@@ -93,25 +93,25 @@ def main():
         food.draw()
         
         # Draw obstacles
-        # for obstacle in obstacles:
-        #     pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], OBSTACLE_BLOCK_SIZE, BLOCK_SIZE))
+        for obstacle in obstacles:
+            pygame.draw.rect(screen, GREEN, (obstacle[0], obstacle[1], OBSTACLE_BLOCK_SIZE, BLOCK_SIZE))
         
         # Check for collision with obstacles
-        # for obstacle in obstacles:
-        #     if (snake.x, snake.y) == obstacle:
-        #         print("Game Over")
-        #         print("Final Score:", score)
-        #         pygame.quit()
-        #         sys.exit()
+        for obstacle in obstacles:
+            if (snake.x, snake.y) == obstacle:
+                print("Game Over")
+                print("Final Score:", score)
+                pygame.quit()
+                sys.exit()
 
         # check for collision with self and boundaries
-        # if (snake.x < 0 or snake.x >= WIDTH or
-        #     snake.y < 0 or snake.y >= HEIGHT or
-        #     (snake.x, snake.y) in snake.body[:-1]):
-        #     print("game over")
-        #     print("final score:", score)
-        #     pygame.quit()
-        #     sys.exit()
+        if (snake.x < 0 or snake.x >= WIDTH or
+            snake.y < 0 or snake.y >= HEIGHT or
+            (snake.x, snake.y) in snake.body[:-1]):
+            print("game over")
+            print("final score:", score)
+            pygame.quit()
+            sys.exit()
 
         if snake.x == food.x and snake.y == food.y:
             food = Food()
