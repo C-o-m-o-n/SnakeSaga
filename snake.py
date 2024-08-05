@@ -13,7 +13,7 @@ OBSTACLE_BLOCK_SIZE = random.randint(BLOCK_SIZE, BLOCK_SIZE * random.randint(2, 
 SPEED = 10
 
 # Set up colors
-BLACK = (0, 0, 0)
+BLACK = (0, 20, 30)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
