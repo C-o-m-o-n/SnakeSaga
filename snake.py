@@ -26,6 +26,15 @@ time = 0
 
 # Initialize obstacles
 obstacles = []
+levels = [
+    {"speed": 7, "num_obstacles": 0},
+    {"speed": 10, "num_obstacles": 5},
+    {"speed": 15, "num_obstacles": 10},
+    {"speed": 20, "num_obstacles": 15},
+    # Add more levels as needed
+]
+current_level = 0
+
 
 # Set up display and font
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -51,6 +60,29 @@ def load_high_score():
             return data["high_score"]
     except FileNotFoundError:
         return 0
+
+def start_level(level):
+    global SPEED, obstacles
+    SPEED = levels[level]["speed"]
+    num_obstacles = levels[level]["num_obstacles"]
+    
+    # Generate obstacles based on the current level
+    obstacles = []
+    for _ in range(num_obstacles):
+        x = random.randint(0, WIDTH - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
+        y = random.randint(0, HEIGHT - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
+        obstacles.append((x, y))
+
+def check_level_progression(score):
+    global current_level
+    if score >= (current_level + 1) * 5:  # Progress to the next level every 5 points
+        current_level += 1
+        if current_level < len(levels):
+            start_level(current_level)
+        else:
+            print("You've completed all levels!")
+            pygame.quit()
+            sys.exit()
 
 
 for _ in range(10):
@@ -91,12 +123,13 @@ class Food:
         pygame.draw.rect(screen, GREEN, (self.x, self.y, BLOCK_SIZE, BLOCK_SIZE))
 
 def main():
-    global score, time
+    global score, time, current_level
     clock = pygame.time.Clock()
     snake = Snake()
     food = Food()
 
     high_score = load_high_score()
+    start_level(current_level)
 
     while True:
         for event in pygame.event.get():
@@ -148,6 +181,8 @@ def main():
             snake.body.append((snake.x, snake.y))
 
             score += 1
+            check_level_progression(score)
+
 
         elif (snake.x < 0 or snake.x >= WIDTH or snake.y < 0 or snake.y >= HEIGHT or (snake.x, snake.y) in snake.body[:-1]):
             print("Game Over")
