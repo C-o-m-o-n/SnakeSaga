@@ -2,7 +2,6 @@ import pygame
 import sys
 import random
 import json
-#import time
 
 # Initialize Pygame
 pygame.init()
@@ -12,7 +11,6 @@ WIDTH, HEIGHT = 800, 600
 BLOCK_SIZE = 20
 OBSTACLE_BLOCK_SIZE = random.randint(BLOCK_SIZE, BLOCK_SIZE * random.randint(2, 9))
 SPEED = 10
-
 
 # Set up colors
 BLACK = (0, 0, 0)
@@ -29,37 +27,67 @@ obstacles = []
 levels = [
     {"speed": 7, "num_obstacles": 0},
     {"speed": 10, "num_obstacles": 5},
-    {"speed": 15, "num_obstacles": 10},
-    {"speed": 20, "num_obstacles": 15},
-    # Add more levels as needed
+    {"speed": 13, "num_obstacles": 10},
+    {"speed": 16, "num_obstacles": 15},
 ]
 current_level = 0
-
 
 # Set up display and font
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
 font = pygame.font.Font(None, 36)
 
-def save_high_score(score):
-    try:
-        with open("high_score.json", "r") as file:
-            data = json.load(file)
-            if score > data["high_score"]:
-                data["high_score"] = score
-                with open("high_score.json", "w") as file:
-                    json.dump(data, file)
-    except FileNotFoundError:
-        with open("high_score.json", "w") as file:
-            json.dump({"high_score": score}, file)
+class GameStaus:
+    def __init__(self):
+        self.score = score
+        self.current_level = current_level
 
-def load_high_score():
-    try:
-        with open("high_score.json", "r") as file:
-            data = json.load(file)
-            return data["high_score"]
-    except FileNotFoundError:
-        return 0
+    #save save_high_score
+    def save_high_score(self, score):
+        try:
+            with open("game_status.json", "r") as file:
+                data = json.load(file)
+                if score > data["high_score"]:
+                    data["high_score"] = score
+                    with open("game_status.json", "w") as file:
+                        json.dump(data, file)
+
+        except FileNotFoundError:
+            with open("game_status.json", "w") as file:
+                json.dump({"high_score": score}, file)
+
+    #save level
+    def save_level(self, current_level):
+        try:
+            with open("game_status.json", "r") as file:
+                data = json.load(file)
+                if current_level > data["highest_level"]:
+                        data["highest_level"] = current_level
+                        with open("game_status.json", "w") as file:
+                            json.dump(data, file)
+        except FileNotFoundError:
+            with open("game_status.json", "w") as file:
+                json.dump({"highest_level": current_level}, file)
+    
+    #load high score
+    def load_high_score(self):
+        try:
+            with open("game_status.json", "r") as file:
+                data = json.load(file)
+                return data["high_score"]
+        except FileNotFoundError:
+            return 0
+
+    #load level
+    def load_level(self):
+        try:
+            with open("game_status.json", "r") as file:
+                data = json.load(file)
+                return data["highest_level"]
+        except FileNotFoundError:
+            return 0
+
+game_status = GameStaus()
 
 def start_level(level):
     global SPEED, obstacles
@@ -84,12 +112,10 @@ def check_level_progression(score):
             pygame.quit()
             sys.exit()
 
-
 for _ in range(10):
     x = random.randint(0, WIDTH - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
     y = random.randint(0, HEIGHT - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
     obstacles.append((x, y))
-
 class Snake:
     def __init__(self):
         self.x = WIDTH // 2
@@ -113,7 +139,6 @@ class Snake:
     def draw(self):
         for pos in self.body:
             pygame.draw.rect(screen, WHITE, (pos[0], pos[1], BLOCK_SIZE, BLOCK_SIZE))
-
 class Food:
     def __init__(self):
         self.x = random.randint(0, WIDTH - BLOCK_SIZE) // BLOCK_SIZE * BLOCK_SIZE
@@ -128,7 +153,9 @@ def main():
     snake = Snake()
     food = Food()
 
-    high_score = load_high_score()
+    high_score = game_status.load_high_score()
+    highest_level = game_status.load_level()
+
     start_level(current_level)
 
     while True:
@@ -161,7 +188,9 @@ def main():
                 print("Game Over")
                 print("Final Score:", score)
                 
-                save_high_score(score)
+                game_status.save_high_score(score)
+                game_status.save_level(current_level)
+
                 pygame.quit()
                 sys.exit()
 
@@ -171,7 +200,8 @@ def main():
             (snake.x, snake.y) in snake.body[:-1]):
             print("game over")
             print("final score:", score)
-            save_high_score(score)
+            game_status.save_high_score(score)
+            game_status.save_level(current_level)
             
             pygame.quit()
             sys.exit()
@@ -183,29 +213,32 @@ def main():
             score += 1
             check_level_progression(score)
 
-
         elif (snake.x < 0 or snake.x >= WIDTH or snake.y < 0 or snake.y >= HEIGHT or (snake.x, snake.y) in snake.body[:-1]):
             print("Game Over")
             print("Final Score:", score)
 
-            save_high_score(score)
+            game_status.save_high_score(score)
+            game_status.save_level(current_level)
             pygame.quit()
             sys.exit()
-
 
         # Update time
         time += 1 / SPEED
         
         # Display score
-        score_text = font.render("Score: " + str(score), True, WHITE)
+        score_text = font.render("S: " + str(score), True, WHITE)
         screen.blit(score_text, (10, 10))
 
         # Display high score
-        high_score_text = font.render("H: " + str(high_score), True, WHITE)
+        high_score_text = font.render("HS: " + str(high_score), True, WHITE)
         screen.blit(high_score_text, (150, 10))
+
+        # Display current level
+        current_level_text = font.render("HL: " + str(current_level), True, WHITE)
+        screen.blit(current_level_text, (350, 10))
         
         # Display time
-        time_text = font.render("Time: " + str(int(time)), True, WHITE)
+        time_text = font.render("T: " + str(int(time)), True, WHITE)
         screen.blit(time_text, (250, 10))        
         pygame.display.flip()
         clock.tick(SPEED)
