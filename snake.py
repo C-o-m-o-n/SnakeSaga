@@ -103,7 +103,7 @@ def start_level(level):
 
 def check_level_progression(score):
     global current_level
-    if score >= (current_level + 1) * 5:  # Progress to the next level every 5 points
+    if score >= (current_level + 1) * 10:  # Progress to the next level every 5 points
         current_level += 1
         if current_level < len(levels):
             start_level(current_level)
@@ -155,6 +155,9 @@ def main():
 
     high_score = game_status.load_high_score()
     highest_level = game_status.load_level()
+
+    if highest_level > 0:
+        current_level = highest_level
 
     start_level(current_level)
 
