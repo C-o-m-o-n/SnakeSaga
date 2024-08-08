@@ -30,7 +30,7 @@ Thank you for considering contributing to Snake Game! We welcome contributions f
 
 ## Getting Started with Contributing
 1. Fork the repository using the "Fork" button on the top-right corner of the GitHub page.
-2. Clone the forked repository using git clone https://github.com/your-username/snake-game.git
+2. Clone the forked repository using git clone https://github.com/your-username/SnakeSaga.git
 3. Install the required libraries using pip install pygame
 4. Make your changes and commit them using git add. and git commit -m "Your commit message"
 
